@@ -23,10 +23,10 @@ int main (void)
         tinygl_update();
         navswitch_update();
 
-        if(navswitch_push_event_p (NAVSWITCH_NORTH)) {
+        if(navswitch_push_event_p (NAVSWITCH_SOUTH)) {
             paddle_move_right();
         }
-        if(navswitch_push_event_p (NAVSWITCH_SOUTH)) {
+        if(navswitch_push_event_p (NAVSWITCH_NORTH)) {
             paddle_move_left();
         }
     }
