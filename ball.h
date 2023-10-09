@@ -43,9 +43,9 @@ void send_ball (ball_state_t state);
 ball_state_t receive_ball(void);
 
 /** Turns off the ball
- * @param state the state of the ball
+ *
 */
-ball_state_t turn_off_ball(ball_state_t state);
+void turn_off_ball(void);
 
 
 

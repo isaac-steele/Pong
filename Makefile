@@ -16,7 +16,7 @@ all: game.out
 
 
 # Compile: create object files from C source files.
-game.o: game.c ../../drivers/avr/system.h paddle.h
+game.o: game.c ../../drivers/avr/system.h paddle.h ball.h ../../utils/tinygl.h ../../utils/pacer.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 system.o: ../../drivers/avr/system.c ../../drivers/avr/system.h
@@ -43,14 +43,30 @@ pacer.o: ../../utils/pacer.c ../../drivers/avr/system.h ../../drivers/avr/timer.
 timer.o: ../../drivers/avr/timer.c ../../drivers/avr/system.h ../../drivers/avr/timer.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-paddle.o: paddle.c ../../drivers/avr/system.h ../../utils/tinygl.h ../../utils/pacer.h
+paddle.o: paddle.c paddle.h ../../drivers/avr/system.h ../../utils/tinygl.h ../../utils/pacer.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 navswitch.o: ../../drivers/navswitch.c ../../drivers/avr/delay.h ../../drivers/avr/pio.h ../../drivers/avr/system.h ../../drivers/navswitch.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
+ir_uart.o: ../../drivers/avr/ir_uart.c ../../drivers/avr/delay.h ../../drivers/avr/ir_uart.h ../../drivers/avr/pio.h ../../drivers/avr/system.h ../../drivers/avr/timer0.h ../../drivers/avr/usart1.h
+	$(CC) -c $(CFLAGS) $< -o $@	
+
+ball.o: ball.c ball.h ../../drivers/avr/system.h ../../drivers/avr/ir_uart.h ../../utils/tinygl.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+usart1.o: ../../drivers/avr/usart1.c ../../drivers/avr/system.h ../../drivers/avr/usart1.h
+	$(CC) -c $(CFLAGS) $< -o $@	
+
+timer0.o: ../../drivers/avr/timer0.c ../../drivers/avr/bits.h ../../drivers/avr/prescale.h ../../drivers/avr/system.h ../../drivers/avr/timer0.h
+	$(CC) -c $(CFLAGS) $< -o $@	
+
+prescale.o: ../../drivers/avr/prescale.c ../../drivers/avr/prescale.h ../../drivers/avr/system.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+
 # Link: create ELF output file from object files.
-game.out: game.o system.o tinygl.o display.o ledmat.o pio.o font.o pacer.o timer.o paddle.o navswitch.o
+game.out: game.o system.o tinygl.o display.o ledmat.o pio.o font.o pacer.o timer.o paddle.o navswitch.o ball.o ir_uart.o usart1.o timer0.o prescale.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 

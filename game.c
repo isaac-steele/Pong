@@ -33,5 +33,7 @@ int main (void)
         if(navswitch_push_event_p (NAVSWITCH_SOUTH)) {
             paddle_move_left();
         }
+
+        tinygl_draw_point(ball.pos, 1);
     }
 }
