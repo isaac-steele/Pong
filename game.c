@@ -11,10 +11,9 @@ int main (void)
 {
 
     system_init ();
-    
+
     tinygl_init(LOOP_RATE);
     pacer_init(LOOP_RATE);
-
     paddle_init();
     navswitch_init();
 
@@ -22,5 +21,13 @@ int main (void)
     {
         pacer_wait();
         tinygl_update();
+        navswitch_update();
+
+        if(navswitch_push_event_p (NAVSWITCH_NORTH)) {
+            paddle_move_right();
+        }
+        if(navswitch_push_event_p (NAVSWITCH_SOUTH)) {
+            paddle_move_left();
+        }
     }
 }
