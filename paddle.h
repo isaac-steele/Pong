@@ -9,6 +9,7 @@
 
 #include "system.h"
 
+/* Basic padedle funcitonality*/
 void paddle_init(void);
 void paddle_move_left(void);
 void paddle_move_right(void);
