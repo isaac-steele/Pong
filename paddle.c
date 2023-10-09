@@ -13,8 +13,8 @@
  * Initialize paddle ends and draw a line between these two points
  * Points are updated via paddle_move_right and paddle_move_left
 */
-static int paddleLeft = 2;
-static int paddleRight = 4;
+int paddleLeft = 2;
+int paddleRight = 4;
 
 /** Initialize the paddle */
 void paddle_init(void)
@@ -23,7 +23,8 @@ void paddle_init(void)
     tinygl_draw_line (tinygl_point (4, paddleLeft), tinygl_point (4, paddleRight), 1);
 }
 
-
+/** Shifts paddle to the left by one pixel
+*/
 void paddle_move_left(void)
 {
     if(paddleLeft > 0) { // prevents the paddle from moving past the end points of the matrix
@@ -34,7 +35,8 @@ void paddle_move_left(void)
     tinygl_draw_line (tinygl_point (4, paddleLeft), tinygl_point (4, paddleRight), 1);
 }
 
-/** Identical to paddle_move_left but in opposite direction*/
+/** Identical to paddle_move_left but in opposite direction
+*/
 void paddle_move_right(void)
 {
     if(paddleRight < 6) {
@@ -44,4 +46,3 @@ void paddle_move_right(void)
     tinygl_clear(); 
     tinygl_draw_line (tinygl_point (4, paddleLeft), tinygl_point (4, paddleRight), 1);
 }
-
