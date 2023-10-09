@@ -46,9 +46,11 @@ timer.o: ../../drivers/avr/timer.c ../../drivers/avr/system.h ../../drivers/avr/
 paddle.o: paddle.c ../../drivers/avr/system.h ../../utils/tinygl.h ../../utils/pacer.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
+navswitch.o: ../../drivers/navswitch.c ../../drivers/avr/delay.h ../../drivers/avr/pio.h ../../drivers/avr/system.h ../../drivers/navswitch.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
 # Link: create ELF output file from object files.
-game.out: game.o system.o tinygl.o display.o ledmat.o pio.o font.o pacer.o timer.o paddle.o
+game.out: game.o system.o tinygl.o display.o ledmat.o pio.o font.o pacer.o timer.o paddle.o navswitch.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 
