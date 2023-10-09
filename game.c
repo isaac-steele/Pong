@@ -1,6 +1,7 @@
 #include "system.h"
 #include "pacer.h"
 #include "tinygl.h"
+#include "navswitch.h"
 
 #include "paddle.h"
     
@@ -15,6 +16,7 @@ int main (void)
     pacer_init(LOOP_RATE);
 
     paddle_init();
+    navswitch_init();
 
     while (1)
     {
