@@ -42,7 +42,7 @@ ball_state_t ball_update (ball_state_t state)
     {
         ball_dir_t newdir[] = {DIR_E, DIR_SE, DIR_NE,
                                 DIR_W, DIR_NW, DIR_SW};
-        state.pos.y -= 2 * hops[state.dir].y;
+        state.pos.y -= 2 * movement[state.dir].y;
         state.dir = newdir[state.dir];
     }
     
@@ -64,7 +64,7 @@ ball_state_t ball_update (ball_state_t state)
 /** Sends the current position of the ball to another device
  * @param state the state of the ball
 */
-void send_ball (ball_state_t state);
+void send_ball (ball_state_t state)
 {
     ir_uart_putc(state.pos.y);
 }
@@ -87,9 +87,9 @@ ball_state_t receive_ball(void)
 
 
 /** Turns off the ball
- * @param state the state of the ball
+ *
 */
-ball_state_t turn_off_ball(ball_state_t state)
+void turn_off_ball(void)
 {
     // Calling this could clear the paddle as well
     tinygl_clear();
