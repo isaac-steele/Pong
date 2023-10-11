@@ -2,6 +2,7 @@
 #include "pacer.h"
 #include "tinygl.h"
 #include "navswitch.h"
+#include "ir_uart.h"
 
 #include "paddle.h"
 #include "ball.h"
@@ -13,10 +14,11 @@ int main (void)
 
     system_init ();
 
-    ball_state_t ball = ball_init (3,3, DIR_SW);
+    ball_state_t ball = ball_init (1,3, DIR_E);
     
     tinygl_init(LOOP_RATE);
     pacer_init(LOOP_RATE);
+    ir_uart_init();
     
     Paddle_pos_t paddle = paddle_init();
     navswitch_init();
@@ -38,9 +40,11 @@ int main (void)
 
         tinygl_draw_point(ball.pos, 1);
 
+        ball = receive_ball();
+
         tick++;
 
-        if (tick >= 40) {
+        if (tick >= 200) {
             tick = 0;
 
             tinygl_draw_point(ball.pos, 0);
