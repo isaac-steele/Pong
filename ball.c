@@ -50,12 +50,13 @@ ball_state_t ball_update (ball_state_t state, Paddle_pos_t paddle)
     if (state.pos.x < 0)
     {
         send_ball(state);
+        turn_off_ball(state);
     }
 
-    if (state.pos.x > TINYGL_WIDTH - 1)    
+    if (state.pos.x > TINYGL_WIDTH - 2)    
     {
         //TODO: this is where it hits the paddle so need to check y position against paddle position.
-        if(state.pos.y <= paddle.right && state.pos.y >= paddle.left) {
+        if(state.pos.y <= paddle.left && state.pos.y >= paddle.right) {
             ball_dir_t newdir[] = {DIR_W, DIR_NW, DIR_SW, 
                                    DIR_E, DIR_SE, DIR_NE};
             state.pos.x -= 2 * movement[state.dir].x;

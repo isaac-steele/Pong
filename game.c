@@ -14,7 +14,7 @@ int main (void)
 
     system_init ();
 
-    ball_state_t ball = ball_init (1,3, DIR_E);
+    ball_state_t ball = ball_init (1,5, DIR_SE);
     
     tinygl_init(LOOP_RATE);
     pacer_init(LOOP_RATE);
@@ -24,6 +24,8 @@ int main (void)
     navswitch_init();
 
     int tick = 0;
+
+    tinygl_draw_point(ball.pos, 1);
 
     while (1)
     {
@@ -38,9 +40,10 @@ int main (void)
             paddle = paddle_move_left(paddle);
         }
 
-        tinygl_draw_point(ball.pos, 1);
+        //TODO need a revamp of the ir
+        // need something to check the send and check the receive
 
-        ball = receive_ball();
+        //ball = receive_ball();
 
         tick++;
 
