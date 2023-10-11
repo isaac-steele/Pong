@@ -8,6 +8,7 @@
 #include "system.h"
 #include "ball.h" 
 #include "ir_uart.h"
+#include "paddle.h"
 
 /** Initialise the state of a ball
     @param xstart x coordinate to start at
@@ -57,8 +58,8 @@ ball_state_t ball_update (ball_state_t state)
         if(state.pos.y <= paddle.right && state.pos.y >= paddle.left) {
             ball_dir_t newdir[] = {DIR_W, DIR_NW, DIR_SW, 
                                    DIR_E, DIR_SE, DIR_NE};
-            state.pos.x -= 2 * movement[state.dir].x
-            state.dir = newdir[state.dir]
+            state.pos.x -= 2 * movement[state.dir].x;
+            state.dir = newdir[state.dir];
         } else {
             //TODO: game over
         }
@@ -83,18 +84,21 @@ void send_ball (ball_state_t state)
  * @return state
 */
 ball_state_t receive_ball(void) 
-{   
+{  
+    ball_state_t state;
+
     if (ir_uart_read_ready_p ()) {
         uint8_t yposition = ir_uart_getc ();
         uint8_t dir = ir_uart_getc ();
-        ball_state_t state;
 
         state.pos.x = 0;
         state.pos.y = yposition;
         state.dir = get_dir(dir);
 
-        return state;
+        
     }
+
+    return state;
 
    
 }
@@ -118,13 +122,19 @@ uint8_t send_dir(ball_dir_t dir)
 {
     uint8_t new_dir;
 
-    switch(dir) {
+    switch(dir) 
+    {
         case DIR_W:
             new_dir = 0;
+            break;
         case DIR_SW:
             new_dir = 1;
+            break;
         case DIR_NW:
             new_dir = 2;
+            break;
+        default:
+            break;
     }
 
     return new_dir;
@@ -137,15 +147,21 @@ uint8_t send_dir(ball_dir_t dir)
 */
 ball_dir_t get_dir(uint8_t dir_number)
 {
-ball_dir_t new_dir;
+    ball_dir_t new_dir;
 
-    switch(dir_number) {
+    switch(dir_number) 
+    {
         case 0:
             new_dir = DIR_E;
+            break;
         case 1:
             new_dir = DIR_SE;
+            break;
         case 2:
             new_dir = DIR_NE;
+            break;
+        default:
+            break;
     }
 
     return new_dir;

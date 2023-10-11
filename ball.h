@@ -59,7 +59,7 @@ uint8_t send_dir(ball_dir_t dir);
  * @param dir_number the directon number
  * @return ball direction
 */
-ball_dir_t get_dir(uint8_t dir_number)
+ball_dir_t get_dir(uint8_t dir_number);
 
 
 
