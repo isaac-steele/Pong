@@ -13,8 +13,8 @@
  * Initialize paddle ends and draw a line between these two points
  * Points are updated via paddle_move_right and paddle_move_left
 */
-int paddleLeft = 2;
-int paddleRight = 4;
+extern int paddleLeft = 2;
+extern int paddleRight = 4;
 
 /** Initialize the paddle */
 void paddle_init(void)
