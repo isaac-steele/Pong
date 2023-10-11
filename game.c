@@ -28,10 +28,10 @@ int main (void)
         navswitch_update();
 
         if(navswitch_push_event_p (NAVSWITCH_SOUTH)) {
-            paddle_move_right(paddle);
+            paddle = paddle_move_right(paddle);
         }
         if(navswitch_push_event_p (NAVSWITCH_NORTH)) {
-            paddle_move_left(paddle);
+            paddle = paddle_move_left(paddle);
         }
 
         tinygl_draw_point(ball.pos, 1);

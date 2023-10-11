@@ -16,7 +16,7 @@ typedef struct {
 
 /* Basic padedle funcitonality*/
 Paddle_pos_t paddle_init(void);
-void paddle_move_left(Paddle_pos_t paddle);
-void paddle_move_right(Paddle_pos_t paddle);
+Paddle_pos_t paddle_move_left(Paddle_pos_t paddle);
+Paddle_pos_t paddle_move_right(Paddle_pos_t paddle);
 
 #endif /* PACER_H*/
