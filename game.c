@@ -54,6 +54,10 @@ int main (void)
 
             ball = ball_update(ball, paddle);
 
+            if(check_ball_received()) {
+                ball = receive_ball();
+            }
+
             tinygl_draw_point(ball.pos, 1);
         }
     }

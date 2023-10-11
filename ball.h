@@ -64,6 +64,13 @@ uint8_t send_dir(ball_dir_t dir);
 ball_dir_t get_dir(uint8_t dir_number);
 
 
+/**
+ * Checks if a ball is received or not
+ * @return num whihc is 1 or 0 depnidng if a ball is received
+*/
+uint8_t check_ball_received(void);
+
+
 
 
 #endif /* BALL_H */
