@@ -9,6 +9,7 @@
 #define BALL_H
 
 #include "tinygl.h"
+#include "paddle.h"
 
 /** Compass direction of ball.  */
 typedef enum dir {DIR_E, DIR_NE, DIR_SE,
@@ -21,8 +22,9 @@ typedef struct state {tinygl_point_t pos; ball_dir_t dir;} ball_state_t;
 
 /** Update the state of a ball bouncing off the edges of the display
     @param state current state
+    @param paddle the paddle
     @return new state.  */
-ball_state_t ball_update (ball_state_t state);
+ball_state_t ball_update (ball_state_t state, Paddle_pos_t paddle);
 
 
 /** Initialise the state of a ball

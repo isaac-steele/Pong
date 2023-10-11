@@ -31,7 +31,7 @@ ball_state_t ball_init (uint8_t xstart, uint8_t ystart, ball_dir_t dir)
 /** Update the state of a ball bouncing off the edges of the display
     @param state current state
     @return new state.  */
-ball_state_t ball_update (ball_state_t state) 
+ball_state_t ball_update (ball_state_t state, Paddle_pos_t paddle) 
 {
     tinygl_point_t movement[] = {{1, 0}, {1, 1}, {1, -1},
                              {-1, 0}, {-1, -1}, {-1, 1}};
@@ -120,7 +120,7 @@ void turn_off_ball(ball_state_t state)
 */
 uint8_t send_dir(ball_dir_t dir)
 {
-    uint8_t new_dir;
+    uint8_t new_dir = 0;
 
     switch(dir) 
     {
@@ -147,7 +147,7 @@ uint8_t send_dir(ball_dir_t dir)
 */
 ball_dir_t get_dir(uint8_t dir_number)
 {
-    ball_dir_t new_dir;
+    ball_dir_t new_dir = 0;
 
     switch(dir_number) 
     {
