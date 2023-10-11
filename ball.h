@@ -43,9 +43,24 @@ void send_ball (ball_state_t state);
 ball_state_t receive_ball(void);
 
 /** Turns off the ball
- *
+ *@param state the state of the ball
 */
-void turn_off_ball(void);
+void turn_off_ball(ball_state_t state);
+
+/**
+ * Gets the ball_dir to send
+ * @param dir the current direction of the ball
+ * @return ball direction
+*/
+uint8_t send_dir(ball_dir_t dir);
+
+/**
+ * Gets the ball dir
+ * @param dir_number the directon number
+ * @return ball direction
+*/
+ball_dir_t get_dir(uint8_t dir_number)
+
 
 
 
