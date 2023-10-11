@@ -9,9 +9,14 @@
 
 #include "system.h"
 
+typedef struct {
+    int left;
+    int right;
+} Paddle_pos_t;
+
 /* Basic padedle funcitonality*/
-void paddle_init(void);
-void paddle_move_left(void);
-void paddle_move_right(void);
+Paddle_pos_t paddle_init(void);
+void paddle_move_left(Paddle_pos_t paddle);
+void paddle_move_right(Paddle_pos_t paddle);
 
 #endif /* PACER_H*/
