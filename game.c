@@ -18,7 +18,7 @@ int main (void)
     tinygl_init(LOOP_RATE);
     pacer_init(LOOP_RATE);
     
-    paddle_init();
+    Paddle_pos_t paddle = paddle_init();
     navswitch_init();
 
     while (1)
@@ -28,10 +28,10 @@ int main (void)
         navswitch_update();
 
         if(navswitch_push_event_p (NAVSWITCH_SOUTH)) {
-            paddle_move_right();
+            paddle_move_right(paddle);
         }
         if(navswitch_push_event_p (NAVSWITCH_NORTH)) {
-            paddle_move_left();
+            paddle_move_left(paddle);
         }
 
         tinygl_draw_point(ball.pos, 1);
