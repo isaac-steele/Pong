@@ -53,11 +53,27 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
     tinygl_draw_point(ball->pos, 1);
 }
 
+void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game) 
+{
+    tinygl_update();
+    navswitch_update();
+
+    if(navswitch_push_event_p (NAVSWITCH_PUSH)){
+        //TRANSMIT READY TO PLAY
+        game->mode = PLAY_MODE;
+        *paddle = paddle_init();
+    }
+
+    if(ir_uart_read_ready_p()) {
+        //RECIEVE READY TO PLAY 
+        game->mode = PLAY_MODE;
+        *paddle = paddle_init();
+    }
+}
 int main (void)
 {
     initialize();
     Paddle_t paddle;
-    paddle = paddle_init();
     ball_state_t ball = ball_init (1,5, DIR_SE);
 
     Game_state_t game;
@@ -74,8 +90,7 @@ int main (void)
         tick++;
         switch(game.mode) {
             case START_MODE:
-                tinygl_draw_point(ball.pos, 1);
-                game.mode = 1;
+                start_game(&paddle, &ball, &game);
                 break;
             case PLAY_MODE:
                 paddles(&paddle, &ball, &game);
