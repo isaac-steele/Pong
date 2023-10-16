@@ -111,9 +111,9 @@ ball_state_t receive_ball(void)
  * Checks if a ball is received or not
  * @return num whihc is 1 or 0 depnidng if a ball is received
 */
-uint8_t check_ball_received(void)
+uint8_t check_ball_received(ball_state_t state)
 {
-    ball_state_t state = receive_ball();
+    state = receive_ball();
     if(state.pos.x == 0 && state.pos.y == 0 && state.dir == DIR_W) {
         return 0;
     } else {

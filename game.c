@@ -49,18 +49,22 @@ void paddles(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 
 void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 {   
+
     if(game->has_ball){
         tinygl_draw_point(ball->pos, 0);
         *ball = ball_update(*ball, *paddle);
         tinygl_draw_point(ball->pos, 1);
     }
-    if(!game->has_ball){
-        if(check_ball_received()){
-            game->has_ball = true;
-        }
-    }
 }
 
+void check_for_ball(ball_state_t* ball, Game_state_t* game)
+{
+    if(check_ball_received(*ball)){
+        
+        tinygl_draw_point(ball->pos, 1);
+        game->has_ball = true;
+    }
+}
 
 
 void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game) 
@@ -70,7 +74,10 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 
     if(navswitch_push_event_p (NAVSWITCH_PUSH)){
         //TRANSMIT READY TO PLAY
-        ir_uart_putc(1);
+        ir_uart_putc(1);    if(check_ball_received(*ball)){
+        tinygl_draw_point(ball->pos, 1);
+        game->has_ball = true;
+    }
         game->mode = PLAY_MODE;
         *paddle = paddle_init();
         game->has_ball = true;
@@ -83,6 +90,7 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
         if(character == 1) {
             game->mode = PLAY_MODE;
             *paddle = paddle_init();
+            game->has_ball = false;
         }
 
     }
@@ -111,6 +119,9 @@ int main (void)
                 break;
             case PLAY_MODE:
                 paddles(&paddle, &ball, &game);
+                if(!(game.has_ball)){
+                    check_for_ball(&ball, &game);
+                }
                 if(tick >= 200) {
                     do_ball_stuff(&paddle, &ball, &game);
                     tick = 0;
