@@ -3,13 +3,17 @@
 #include "tinygl.h"
 #include "navswitch.h"
 #include "ir_uart.h"
+#include "led.h"
+#include "../fonts/font5x7_1.h"
 
 #include "paddle.h"
 #include "ball.h"
+#include "setup.h"
 
-#define INITIAL_SCORE 0
+#define INITIAL_SCORE (char) 0
 #define START_MODE 0
 #define PLAY_MODE 1
+#define DISPLAY_SCORE 2
 
 
 /* game state, contains all key information about current game state*/
@@ -23,6 +27,7 @@ typedef struct {
 
 
 #define PACER_RATE 1000
+#define MESSAGE_RATE 10
 /* Initialize tinygl, system, navswitch and pacer
 */
 void initialize(void) 
@@ -30,6 +35,8 @@ void initialize(void)
     system_init();
     pacer_init(PACER_RATE);
     tinygl_init(PACER_RATE);
+    tinygl_font_set (&font5x7_1);
+    tinygl_text_speed_set (MESSAGE_RATE);
     navswitch_init();
     ir_uart_init();
 
@@ -53,13 +60,23 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
     if(game->has_ball){
         tinygl_draw_point(ball->pos, 0);
         *ball = ball_update(*ball, *paddle);
-        tinygl_draw_point(ball->pos, 1);
+        if(ball->pos.x == POINT_SCORED ) {
+            //game->opponent_score++;
+            tinygl_clear();
+            game->mode = DISPLAY_SCORE;
+        }
+        else if(ball->pos.x < 0) {
+            game->has_ball = false;
+        } else {
+            tinygl_draw_point(ball->pos, 1);
+        }
+        
     }
 }
 
 void check_for_ball(ball_state_t* ball, Game_state_t* game)
 {
-    if(check_ball_received(*ball)){
+    if(check_ball_received(ball)){
         
         tinygl_draw_point(ball->pos, 1);
         game->has_ball = true;
@@ -74,14 +91,12 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 
     if(navswitch_push_event_p (NAVSWITCH_PUSH)){
         //TRANSMIT READY TO PLAY
-        ir_uart_putc(1);    if(check_ball_received(*ball)){
-        tinygl_draw_point(ball->pos, 1);
+        ir_uart_putc(1);   
         game->has_ball = true;
-    }
         game->mode = PLAY_MODE;
         *paddle = paddle_init();
-        game->has_ball = true;
         *ball = ball_init (1,5, DIR_SE);
+        tinygl_draw_point(ball->pos, 1);
     }
 
     if(ir_uart_read_ready_p()) {
@@ -106,8 +121,12 @@ int main (void)
     game.opponent_score = INITIAL_SCORE;
     game.mode = 0;
 
-
+    led_init();
+    led_set(LED1, 0);
     uint32_t tick = 0;
+
+   
+
 
     while(1) {
         pacer_wait();
@@ -127,6 +146,14 @@ int main (void)
                     tick = 0;
                 }
                 break;
+            case DISPLAY_SCORE:
+                led_set(LED1, 1);
+                char buffer[2];
+                buffer[0] = game.opponent_score;
+                buffer[1] = '\0';
+                tinygl_text (buffer);
+                break;
+
         }
 
     }

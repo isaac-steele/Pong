@@ -11,6 +11,8 @@
 #include "tinygl.h"
 #include "paddle.h"
 
+#define POINT_SCORED -100
+
 /** Compass direction of ball.  */
 typedef enum dir {DIR_E, DIR_NE, DIR_SE,
                   DIR_W, DIR_SW, DIR_NW} ball_dir_t;
@@ -68,7 +70,7 @@ ball_dir_t get_dir(uint8_t dir_number);
  * Checks if a ball is received or not
  * @return num whihc is 1 or 0 depnidng if a ball is received
 */
-uint8_t check_ball_received(ball_state_t state);
+uint8_t check_ball_received(ball_state_t* state);
 
 
 

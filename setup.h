@@ -8,10 +8,5 @@
 #include "system.h"
 #include "tinygl.h"
 
-typedef struct {
-    bool player1;
-    bool has_ball;
-} Player_info_t;
 
-
-void selectPlayer(Player_info_t player);
+void display_score (char character);

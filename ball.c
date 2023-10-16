@@ -62,7 +62,8 @@ ball_state_t ball_update (ball_state_t state, Paddle_t paddle)
             state.pos.x -= 2 * movement[state.dir].x;
             state.dir = newdir[state.dir];
         } else {
-            //TODO: game over
+            turn_off_ball(state);
+            state.pos.x = POINT_SCORED;
         }
     }
 
@@ -95,13 +96,12 @@ ball_state_t receive_ball(void)
         uint8_t yposition = ir_uart_getc ();
         uint8_t dir = ir_uart_getc ();
 
-        state.pos.x = 0;
-        state.pos.y = yposition;
-        state.dir = get_dir(dir);
+        state = ball_init(0, yposition, get_dir(dir));
+        
 
         
     }
-
+   
     return state;
 
    
@@ -111,10 +111,10 @@ ball_state_t receive_ball(void)
  * Checks if a ball is received or not
  * @return num whihc is 1 or 0 depnidng if a ball is received
 */
-uint8_t check_ball_received(ball_state_t state)
+uint8_t check_ball_received(ball_state_t* state)
 {
-    state = receive_ball();
-    if(state.pos.x == 0 && state.pos.y == 0 && state.dir == DIR_W) {
+    *state = receive_ball();
+    if(state->pos.x == 0 && state->pos.y == 0 && state->dir == DIR_W) {
         return 0;
     } else {
         return 1;
