@@ -16,7 +16,8 @@
 typedef struct {
     char score;
     char opponent_score;
-    uint8_t mode; //game modes: SETUP==0, PLAY == 1, DISPLAY_SCORE == 2 
+    uint8_t mode; //game modes: SETUP==0, PLAY == 1, DISPLAY_SCORE == 2
+    bool has_ball;
 } Game_state_t;
 
 
@@ -47,11 +48,20 @@ void paddles(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 }
 
 void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
-{
-    tinygl_draw_point(ball->pos, 0);
-    *ball = ball_update(*ball, *paddle);
-    tinygl_draw_point(ball->pos, 1);
+{   
+    if(game->has_ball){
+        tinygl_draw_point(ball->pos, 0);
+        *ball = ball_update(*ball, *paddle);
+        tinygl_draw_point(ball->pos, 1);
+    }
+    if(!game->has_ball){
+        if(check_ball_received()){
+            game->has_ball = true;
+        }
+    }
 }
+
+
 
 void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game) 
 {
@@ -60,23 +70,30 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 
     if(navswitch_push_event_p (NAVSWITCH_PUSH)){
         //TRANSMIT READY TO PLAY
+        ir_uart_putc(1);
         game->mode = PLAY_MODE;
         *paddle = paddle_init();
+        game->has_ball = true;
+        *ball = ball_init (1,5, DIR_SE);
     }
 
     if(ir_uart_read_ready_p()) {
         //RECIEVE READY TO PLAY 
-        game->mode = PLAY_MODE;
-        *paddle = paddle_init();
+        char character = ir_uart_getc();
+        if(character == 1) {
+            game->mode = PLAY_MODE;
+            *paddle = paddle_init();
+        }
+
     }
 }
 int main (void)
 {
     initialize();
     Paddle_t paddle;
-    ball_state_t ball = ball_init (1,5, DIR_SE);
-
+    ball_state_t ball;
     Game_state_t game;
+
     game.score = INITIAL_SCORE;
     game.opponent_score = INITIAL_SCORE;
     game.mode = 0;
