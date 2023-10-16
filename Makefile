@@ -64,9 +64,12 @@ timer0.o: ../../drivers/avr/timer0.c ../../drivers/avr/bits.h ../../drivers/avr/
 prescale.o: ../../drivers/avr/prescale.c ../../drivers/avr/prescale.h ../../drivers/avr/system.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
+setup.o: setup.c setup.h ../../utils/tinygl.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
 
 # Link: create ELF output file from object files.
-game.out: game.o system.o tinygl.o display.o ledmat.o pio.o font.o pacer.o timer.o paddle.o navswitch.o ball.o ir_uart.o usart1.o timer0.o prescale.o
+game.out: game.o system.o tinygl.o display.o ledmat.o pio.o font.o pacer.o timer.o paddle.o navswitch.o ball.o ir_uart.o usart1.o timer0.o prescale.o setup.o
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 	$(SIZE) $@
 

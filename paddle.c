@@ -18,10 +18,10 @@
 /* Initialize the paddle 
  * @return 
 */
-Paddle_pos_t paddle_init(void)
+Paddle_t paddle_init(void)
 {   
     tinygl_clear(); // clear the board before adding the paddle
-    Paddle_pos_t paddle;
+    Paddle_t paddle;
     paddle.left = 4;
     paddle.right = 2;
 
@@ -33,7 +33,7 @@ Paddle_pos_t paddle_init(void)
  * @param paddle paddle position struct
  * @return updated paddle position
 */
-Paddle_pos_t paddle_move_left(Paddle_pos_t paddle)
+Paddle_t paddle_move_left(Paddle_t paddle)
 {
     if(paddle.right > 0) { // prevents the paddle from moving past the end points of the matrix
         paddle.left -=1;
@@ -48,7 +48,7 @@ Paddle_pos_t paddle_move_left(Paddle_pos_t paddle)
  * @param paddle
  * @return updated paddle position
 */
-Paddle_pos_t paddle_move_right(Paddle_pos_t paddle)
+Paddle_t paddle_move_right(Paddle_t paddle)
 {
     if(paddle.left < 6) {
         paddle.left +=1;

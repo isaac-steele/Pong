@@ -12,11 +12,11 @@
 typedef struct {
     int left;
     int right;
-} Paddle_pos_t;
+} Paddle_t;
 
 /* Basic padedle funcitonality*/
-Paddle_pos_t paddle_init(void);
-Paddle_pos_t paddle_move_left(Paddle_pos_t paddle);
-Paddle_pos_t paddle_move_right(Paddle_pos_t paddle);
+Paddle_t paddle_init(void);
+Paddle_t paddle_move_left(Paddle_t paddle);
+Paddle_t paddle_move_right(Paddle_t paddle);
 
 #endif /* PACER_H*/

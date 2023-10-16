@@ -24,7 +24,7 @@ typedef struct state {tinygl_point_t pos; ball_dir_t dir;} ball_state_t;
     @param state current state
     @param paddle the paddle
     @return new state.  */
-ball_state_t ball_update (ball_state_t state, Paddle_pos_t paddle);
+ball_state_t ball_update (ball_state_t state, Paddle_t paddle);
 
 
 /** Initialise the state of a ball
