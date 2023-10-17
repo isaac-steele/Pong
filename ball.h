@@ -72,6 +72,13 @@ ball_dir_t get_dir(uint8_t dir_number);
 */
 uint8_t check_ball_received(ball_state_t* state);
 
+/**
+ * Converts the y position
+ * @param y_pos the y position
+ * @return the updated y position
+*/
+uint8_t convert_ypos(uint8_t ypos);
+
 
 
 

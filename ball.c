@@ -96,9 +96,8 @@ ball_state_t receive_ball(void)
         uint8_t yposition = ir_uart_getc ();
         uint8_t dir = ir_uart_getc ();
 
-        state = ball_init(0, yposition, get_dir(dir));
+        state = ball_init(0, convert_ypos(yposition), get_dir(dir));
         
-
         
     }
    
@@ -183,5 +182,34 @@ ball_dir_t get_dir(uint8_t dir_number)
     }
 
     return new_dir;
+}
+
+/**
+ * Converts the y position
+ * @param y_pos the y position
+ * @return the updated y position
+*/
+uint8_t convert_ypos(uint8_t ypos)
+{
+    switch(ypos) {
+        case 0:
+            return 7;
+        case 1:
+            return 6;
+        case 2:
+            return 5;
+        case 3:
+            return 4;
+        case 4:
+            return 3;
+        case 5:
+            return 2;
+        case 6:
+            return 1;
+        case 7:
+            return 0;
+        default:
+            return 0;
+    }
 }
 
