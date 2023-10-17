@@ -14,6 +14,7 @@
 #define START_MODE 0
 #define PLAY_MODE 1
 #define DISPLAY_SCORE 2
+#define GAME_OVER 10
 
 
 /* game state, contains all key information about current game state*/
@@ -41,8 +42,10 @@ void initialize(void)
     ir_uart_init();
 
 }
-
-void paddles(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
+/*Controls movement of the paddles
+    @param 
+*/
+void paddles(Paddle_t* paddle)
 {
     navswitch_update();
     tinygl_update();
@@ -54,6 +57,14 @@ void paddles(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
     }
 }
 
+void make_game_over(Game_state_t* game)
+{
+    game->mode = GAME_OVER;
+    tinygl_clear();
+    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+    tinygl_text ("GAME OVER! PRESS TO PLAY AGAIN ");
+}
+
 void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 {   
 
@@ -62,10 +73,13 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
         *ball = ball_update(*ball, *paddle);
         if(ball->pos.x == POINT_SCORED ) {
             game->opponent_score++;
-            //TODO end the game
-            //TODO correct the trajectory of the ball
-            tinygl_clear();
-            game->mode = DISPLAY_SCORE;
+            if(game->opponent_score == 5) {
+                ir_uart_putc(GAME_OVER);
+                make_game_over(game);
+            } else {
+                tinygl_clear();
+                game->mode = DISPLAY_SCORE;
+            }
         }
         else if(ball->pos.x < 0) {
             game->has_ball = false;
@@ -76,14 +90,8 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
     }
 }
 
-void check_for_ball(ball_state_t* ball, Game_state_t* game)
-{
-    if(check_ball_received(ball)){
-        
-        tinygl_draw_point(ball->pos, 1);
-        game->has_ball = true;
-    }
-}
+
+
 
 
 void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game) 
@@ -99,6 +107,7 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
         *paddle = paddle_init();
         *ball = ball_init (1,5, DIR_SE);
         tinygl_draw_point(ball->pos, 1);
+        game->opponent_score = 0;
     }
 
     if(ir_uart_read_ready_p()) {
@@ -108,10 +117,32 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
             game->mode = PLAY_MODE;
             *paddle = paddle_init();
             game->has_ball = false;
+            game->opponent_score = 0;
         }
 
     }
 }
+
+void check_for_transmission(Game_state_t* game, ball_state_t* ball)
+{
+    uint8_t character = 0;
+    uint8_t dir = 3;
+    if(ir_uart_read_ready_p()){
+        character = ir_uart_getc();
+        if(character == GAME_OVER){
+            make_game_over(game);
+        } else {
+            dir = ir_uart_getc();
+            if(check_ball_received(ball, character, dir)){
+                tinygl_draw_point(ball->pos, 1);
+                game->has_ball = true;
+            }
+        }
+    }
+}
+
+
+
 int main (void)
 {
     initialize();
@@ -121,26 +152,27 @@ int main (void)
 
     game.score = INITIAL_SCORE;
     game.opponent_score = INITIAL_SCORE;
-    game.mode = 0;
+    game.mode = START_MODE;
 
+    led_init();
+    led_set(LED1, 0);
     uint32_t tick = 0;
-
     char scores[6] = "012345";
-
-
     while(1) {
         pacer_wait();
         tinygl_update();
         tick++;
+
         switch(game.mode) {
             case START_MODE:
                 start_game(&paddle, &ball, &game);
                 break;
             case PLAY_MODE:
-                paddles(&paddle, &ball, &game);
-                if(!(game.has_ball)){
-                    check_for_ball(&ball, &game);
-                }
+                paddles(&paddle);
+                check_for_transmission(&game, &ball);
+                // if(!(game.has_ball)){
+                //     check_for_transmission(&game, &ball);
+                // }
                 if(tick >= 200) {
                     do_ball_stuff(&paddle, &ball, &game);
                     tick = 0;
@@ -162,9 +194,14 @@ int main (void)
                     tinygl_text (buffer);
                 }
                 break;
-
+            case GAME_OVER:
+                navswitch_update();
+                if(navswitch_push_event_p (NAVSWITCH_PUSH)){
+                    tinygl_clear();
+                    game.mode = START_MODE;
+                }
+                break;
         }
 
-    }
-
+    }   
 }

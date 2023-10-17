@@ -81,40 +81,39 @@ void send_ball (ball_state_t state)
     ir_uart_putc(send_dir(state.dir));
 }
 
-/** Receives the current state of the ball 
- * @return state
-*/
-ball_state_t receive_ball(void) 
-{  
-    ball_state_t state;
-    state.pos.x = 0;
-    state.pos.y = 0;
-    state.dir = DIR_W;
+// /** Receives the current state of the ball 
+//  * @return state
+// */
+// ball_state_t receive_ball(uint8_t y_pos) 
+// {  
+//     ball_state_t state;
+//     state.pos.x = 0;
+//     state.pos.y = 0;
+//     state.dir = DIR_W;
 
-    if (ir_uart_read_ready_p ()) {
-        uint8_t yposition = ir_uart_getc ();
-        uint8_t dir = ir_uart_getc ();
-
-        state = ball_init(0, convert_ypos(yposition), get_dir(dir));
+//     if (ir_uart_read_ready_p ()) {
+//         uint8_t dir = ir_uart_getc ();
+//         state = ball_init(0, convert_ypos(y_pos), get_dir(dir));
         
         
-    }
+//     }
    
-    return state;
+//     return state;
 
    
-}
+// }
 
 /**
  * Checks if a ball is received or not
  * @return num whihc is 1 or 0 depnidng if a ball is received
 */
-uint8_t check_ball_received(ball_state_t* state)
+uint8_t check_ball_received(ball_state_t* state, uint8_t y_pos, uint8_t dir)
 {
-    *state = receive_ball();
-    if(state->pos.x == 0 && state->pos.y == 0 && state->dir == DIR_W) {
+    //*state = receive_ball(character, dir);
+    if(y_pos == 0 && dir == DIR_W) {
         return 0;
     } else {
+        *state = ball_init(0, convert_ypos(y_pos), get_dir(dir));
         return 1;
     }
 }

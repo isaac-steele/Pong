@@ -41,10 +41,10 @@ ball_state_t ball_init (uint8_t xstart, uint8_t ystart, ball_dir_t dir);
 */
 void send_ball (ball_state_t state);
 
-/** Receives the current state of the ball 
- * @return state
-*/
-ball_state_t receive_ball(void);
+// /** Receives the current state of the ball 
+//  * @return state
+// */
+// ball_state_t receive_ball(uint8_t y_pos);
 
 /** Turns off the ball
  *@param state the state of the ball
@@ -70,7 +70,7 @@ ball_dir_t get_dir(uint8_t dir_number);
  * Checks if a ball is received or not
  * @return num whihc is 1 or 0 depnidng if a ball is received
 */
-uint8_t check_ball_received(ball_state_t* state);
+uint8_t check_ball_received(ball_state_t* state, uint8_t y_pos, uint8_t dir);
 
 /**
  * Converts the y position
