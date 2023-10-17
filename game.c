@@ -91,7 +91,12 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 }
 
 
-
+void display_game_start()
+{
+    tinygl_clear();
+    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
+    tinygl_text ("WELCOME TO PONG! PRESS TO START ");
+}
 
 
 void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game) 
@@ -158,6 +163,9 @@ int main (void)
     led_set(LED1, 0);
     uint32_t tick = 0;
     char scores[6] = "012345";
+
+    display_game_start();
+
     while(1) {
         pacer_wait();
         tinygl_update();
@@ -199,6 +207,7 @@ int main (void)
                 if(navswitch_push_event_p (NAVSWITCH_PUSH)){
                     tinygl_clear();
                     game.mode = START_MODE;
+                    display_game_start();
                 }
                 break;
         }
