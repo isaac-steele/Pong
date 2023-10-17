@@ -1,7 +1,7 @@
 /**
  * @file ball.c
- * @author Isaac Steele, ist46
- * @date 09/10/23
+ * @author Isaac Steele ist46, Kade Lindsay kli107
+ * @date 18 October 2023
  * @brief Makes a ball that can be used for pong
 */
 

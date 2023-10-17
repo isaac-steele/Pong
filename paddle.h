@@ -1,6 +1,6 @@
 /** @file paddle.c
-    @author K. Lindsay
-    @date 9 August 2023
+    @author Isaac Steele ist46, Kade Lindsay kli107
+    @date 18 October 2023
     @brief Paddle support
 */
 

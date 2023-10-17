@@ -1,3 +1,11 @@
+/**
+ * @file game.c
+ * @author Isaac Steele ist46, Kade Lindsay kli107
+ * @date 18 October 2023
+ * @brief A simple pong game that has a scoring system of first to 5 wins
+*/
+
+
 #include "system.h"
 #include "pacer.h"
 #include "tinygl.h"
@@ -56,7 +64,7 @@ void paddles(Paddle_t* paddle)
         *paddle = paddle_move_left(*paddle);
     }
 }
-
+Isaac Steele ist46, Kade Lindsay kli107
 void make_game_over(Game_state_t* game)
 {
     game->mode = GAME_OVER;
@@ -122,7 +130,7 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
             *paddle = paddle_init();
             game->has_ball = false;
             game->opponent_score = 0;
-        }
+        }Isaac Steele ist46, Kade Lindsay kli107
 
     }
 }
@@ -135,7 +143,7 @@ void check_for_transmission(Game_state_t* game, ball_state_t* ball)
         character = ir_uart_getc();
         if(character == GAME_OVER){
             make_game_over(game);
-        } else {
+        } else {Isaac Steele ist46, Kade Lindsay kli107
             dir = ir_uart_getc();
             if(check_ball_received(ball, character, dir)){
                 tinygl_draw_point(ball->pos, 1);
