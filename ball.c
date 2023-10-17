@@ -60,9 +60,20 @@ ball_state_t ball_update (ball_state_t state, Paddle_t paddle)
 
         if(state.pos.y <= paddle.left && state.pos.y >= paddle.right) {
             ball_dir_t newdir[] = {DIR_W, DIR_NW, DIR_SW, 
-                                   DIR_E, DIR_SE, DIR_NE};
-            state.pos.x -= 2 * movement[state.dir].x;
-            state.dir = newdir[state.dir];
+                                        DIR_E, DIR_SE, DIR_NE};
+            state.pos.x -= 2 * movement[state.dir].x;           
+            if(state.pos.y == paddle.left) {
+                state.pos.y += 1;
+                state.dir = DIR_NW;
+            } else if (state.pos.y == paddle.right) {
+                state.pos.y -= 1;
+                state.dir = DIR_SW;
+            } else {
+                state.dir = newdir[state.dir];
+            }
+            
+
+            
         } 
     }
 
@@ -170,10 +181,10 @@ ball_dir_t get_dir(uint8_t dir_number)
             new_dir = DIR_E;
             break;
         case 1:
-            new_dir = DIR_SE;
+            new_dir = DIR_NE;
             break;
         case 2:
-            new_dir = DIR_NE;
+            new_dir = DIR_SE;
             break;
         default:
             break;
@@ -191,20 +202,18 @@ uint8_t convert_ypos(uint8_t ypos)
 {
     switch(ypos) {
         case 0:
-            return 7;
-        case 1:
             return 6;
-        case 2:
+        case 1:
             return 5;
-        case 3:
+        case 2:
             return 4;
-        case 4:
+        case 3:
             return 3;
-        case 5:
+        case 4:
             return 2;
-        case 6:
+        case 5:
             return 1;
-        case 7:
+        case 6:
             return 0;
         default:
             return 0;

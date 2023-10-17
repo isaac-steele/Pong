@@ -39,7 +39,7 @@ Paddle_t paddle_move_left(Paddle_t paddle)
         paddle.left -=1;
         paddle.right -=1;
     }
-    tinygl_clear(); //May be a problem with this, clears board so new paddle does not combine with previous
+    tinygl_clear(); 
     tinygl_draw_line (tinygl_point (4, paddle.left), tinygl_point (4, paddle.right), 1);
     return paddle;
 }

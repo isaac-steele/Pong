@@ -38,6 +38,7 @@ void initialize(void)
     tinygl_init(PACER_RATE);
     tinygl_font_set (&font5x7_1);
     tinygl_text_speed_set (MESSAGE_RATE);
+    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
     navswitch_init();
     ir_uart_init();
 
@@ -47,7 +48,6 @@ void initialize(void)
 */
 void paddles(Paddle_t* paddle)
 {
-    navswitch_update();
     tinygl_update();
     if(navswitch_push_event_p (NAVSWITCH_SOUTH)) {
         *paddle = paddle_move_right(*paddle);
@@ -61,8 +61,11 @@ void make_game_over(Game_state_t* game)
 {
     game->mode = GAME_OVER;
     tinygl_clear();
-    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
-    tinygl_text ("GAME OVER! PRESS TO PLAY AGAIN ");
+    if(game->opponent_score == 5){
+        tinygl_text ("DEFEAT! PRESS TO PLAY AGAIN\0");
+    } else {
+        tinygl_text ("VICTORY! PRESS TO PLAY AGAIN\0");
+    }
 }
 
 void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
@@ -94,23 +97,19 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 void display_game_start()
 {
     tinygl_clear();
-    tinygl_text_mode_set (TINYGL_TEXT_MODE_SCROLL);
-    tinygl_text ("WELCOME TO PONG! PRESS TO START ");
+    tinygl_text ("WELCOME TO PONG! PRESS TO START\0");
 }
 
 
 void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game) 
 {
-    tinygl_update();
-    navswitch_update();
-
     if(navswitch_push_event_p (NAVSWITCH_PUSH)){
         //TRANSMIT READY TO PLAY
         ir_uart_putc(1);   
         game->has_ball = true;
         game->mode = PLAY_MODE;
         *paddle = paddle_init();
-        *ball = ball_init (1,5, DIR_SE);
+        *ball = ball_init (0,3, DIR_E);
         tinygl_draw_point(ball->pos, 1);
         game->opponent_score = 0;
     }
@@ -162,13 +161,14 @@ int main (void)
     led_init();
     led_set(LED1, 0);
     uint32_t tick = 0;
-    char scores[6] = "012345";
+    char scores[7] = "012345\0";
 
     display_game_start();
 
     while(1) {
         pacer_wait();
         tinygl_update();
+        navswitch_update();
         tick++;
 
         switch(game.mode) {
@@ -177,22 +177,20 @@ int main (void)
                 break;
             case PLAY_MODE:
                 paddles(&paddle);
-                check_for_transmission(&game, &ball);
-                // if(!(game.has_ball)){
-                //     check_for_transmission(&game, &ball);
-                // }
+                if(!(game.has_ball)){
+                    check_for_transmission(&game, &ball);
+                } 
                 if(tick >= 200) {
                     do_ball_stuff(&paddle, &ball, &game);
                     tick = 0;
                 }
                 break;
             case DISPLAY_SCORE:
-                navswitch_update ();
                 if(navswitch_push_event_p (NAVSWITCH_PUSH)){
                     tinygl_clear();
                     game.mode = PLAY_MODE;
                     paddle = paddle_init();
-                    ball = ball_init (1,5, DIR_SE);
+                    ball = ball_init (0,3, DIR_E);
                     tinygl_draw_point(ball.pos, 1);
                     game.has_ball = true;
                 } else {
@@ -203,7 +201,6 @@ int main (void)
                 }
                 break;
             case GAME_OVER:
-                navswitch_update();
                 if(navswitch_push_event_p (NAVSWITCH_PUSH)){
                     tinygl_clear();
                     game.mode = START_MODE;
