@@ -39,10 +39,10 @@ Paddle_t paddle_init(void)
 Paddle_t paddle_move_left(Paddle_t paddle)
 {
     if(paddle.right > PADDLE_LEFT_BORDER) { // prevents the paddle from moving past the end of the display
+        tinygl_draw_line (tinygl_point (PADDLE_COLUMN, paddle.left), tinygl_point (PADDLE_COLUMN, paddle.right), 0);
         paddle.left -=1;
         paddle.right -=1;
     }
-    tinygl_clear(); 
     tinygl_draw_line (tinygl_point (PADDLE_COLUMN, paddle.left), tinygl_point (PADDLE_COLUMN, paddle.right), 1);
     return paddle;
 }
@@ -54,6 +54,7 @@ Paddle_t paddle_move_left(Paddle_t paddle)
 Paddle_t paddle_move_right(Paddle_t paddle)
 {
     if(paddle.left < PADDLE_RIGHT_BORDER) {
+        tinygl_draw_line (tinygl_point (PADDLE_COLUMN, paddle.left), tinygl_point (PADDLE_COLUMN, paddle.right), 0);
         paddle.left +=1;
         paddle.right +=1;
     }
