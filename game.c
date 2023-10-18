@@ -16,24 +16,13 @@
 
 #include "paddle.h"
 #include "ball.h"
-#include "setup.h"
+#include "game_state.h"
 
 #define INITIAL_SCORE  0
 #define START_MODE 0
 #define PLAY_MODE 1
 #define DISPLAY_SCORE 2
 #define GAME_OVER 10
-
-
-/* game state, contains all key information about current game state*/
-typedef struct {
-    uint8_t score;
-    uint8_t opponent_score;
-    uint8_t mode; //game modes: SETUP==0, PLAY == 1, DISPLAY_SCORE == 2
-    bool has_ball;
-} Game_state_t;
-
-
 
 #define PACER_RATE 1000
 #define MESSAGE_RATE 10
@@ -64,17 +53,8 @@ void paddles(Paddle_t* paddle)
         *paddle = paddle_move_left(*paddle);
     }
 }
-Isaac Steele ist46, Kade Lindsay kli107
-void make_game_over(Game_state_t* game)
-{
-    game->mode = GAME_OVER;
-    tinygl_clear();
-    if(game->opponent_score == 5){
-        tinygl_text ("DEFEAT! PRESS TO PLAY AGAIN\0");
-    } else {
-        tinygl_text ("VICTORY! PRESS TO PLAY AGAIN\0");
-    }
-}
+
+
 
 void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 {   
@@ -86,7 +66,7 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
             game->opponent_score++;
             if(game->opponent_score == 5) {
                 ir_uart_putc(GAME_OVER);
-                make_game_over(game);
+                game_over(game);
             } else {
                 tinygl_clear();
                 game->mode = DISPLAY_SCORE;
@@ -102,25 +82,13 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 }
 
 
-void display_game_start()
-{
-    tinygl_clear();
-    tinygl_text ("WELCOME TO PONG! PRESS TO START\0");
-}
 
 
-void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game) 
+
+void start_game(Paddle_t* paddle, Game_state_t* game) 
 {
     if(navswitch_push_event_p (NAVSWITCH_PUSH)){
-        //TRANSMIT READY TO PLAY
-        ir_uart_putc(1);   
-        game->has_ball = true;
-        game->mode = PLAY_MODE;
-        *paddle = paddle_init();
-        *ball = ball_init (0,3, DIR_E);
-        tinygl_draw_point(ball->pos, 1);
-        game->opponent_score = 0;
-    }
+        //TRANSMIT READY Tsetup
 
     if(ir_uart_read_ready_p()) {
         //RECIEVE READY TO PLAY 
@@ -130,8 +98,9 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
             *paddle = paddle_init();
             game->has_ball = false;
             game->opponent_score = 0;
-        }Isaac Steele ist46, Kade Lindsay kli107
+        }
 
+    }
     }
 }
 
@@ -142,8 +111,8 @@ void check_for_transmission(Game_state_t* game, ball_state_t* ball)
     if(ir_uart_read_ready_p()){
         character = ir_uart_getc();
         if(character == GAME_OVER){
-            make_game_over(game);
-        } else {Isaac Steele ist46, Kade Lindsay kli107
+            game_over(game);
+        } else {
             dir = ir_uart_getc();
             if(check_ball_received(ball, character, dir)){
                 tinygl_draw_point(ball->pos, 1);
@@ -153,7 +122,15 @@ void check_for_transmission(Game_state_t* game, ball_state_t* ball)
     }
 }
 
-
+void reset_paddle_and_ball(Game_state_t* game, Paddle_t* paddle, ball_state_t* ball)
+{
+    tinygl_clear();
+    game->mode = PLAY_MODE;
+    *paddle = paddle_init();
+    *ball = ball_init (0,3, DIR_E);
+    tinygl_draw_point(ball->pos, 1);
+    game->has_ball = true;
+}
 
 int main (void)
 {
@@ -169,10 +146,8 @@ int main (void)
     led_init();
     led_set(LED1, 0);
     uint32_t tick = 0;
-    char scores[7] = "012345\0";
-
     display_game_start();
-
+    char scores[7] = "012345\0";
     while(1) {
         pacer_wait();
         tinygl_update();
@@ -181,7 +156,7 @@ int main (void)
 
         switch(game.mode) {
             case START_MODE:
-                start_game(&paddle, &ball, &game);
+                start_game(&paddle, &game);
                 break;
             case PLAY_MODE:
                 paddles(&paddle);
@@ -195,17 +170,9 @@ int main (void)
                 break;
             case DISPLAY_SCORE:
                 if(navswitch_push_event_p (NAVSWITCH_PUSH)){
-                    tinygl_clear();
-                    game.mode = PLAY_MODE;
-                    paddle = paddle_init();
-                    ball = ball_init (0,3, DIR_E);
-                    tinygl_draw_point(ball.pos, 1);
-                    game.has_ball = true;
+                    reset_paddle_and_ball(&game, &paddle, &ball);
                 } else {
-                    char buffer[2];
-                    buffer[0] = scores[game.opponent_score];
-                    buffer[1] = '\0';
-                    tinygl_text (buffer);
+                    display_scores(&game, scores);
                 }
                 break;
             case GAME_OVER:
