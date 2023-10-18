@@ -26,8 +26,8 @@
 
 #define PACER_RATE 1000
 #define MESSAGE_RATE 10
-/* Initialize tinygl, system, navswitch and pacer
-*/
+
+/* Initialize all relevant functions such as system, pacer, tinygl, navswitch and IR*/
 void initialize(void) 
 {
     system_init();
@@ -40,29 +40,33 @@ void initialize(void)
     ir_uart_init();
 
 }
-/*Controls movement of the paddles
-    @param 
+
+/** 
+ * Resets the paddle and ball to initial positions
+ * @param game Game_state_t pointer
+ * @param paddle Paddle_t pointer
+ * @param ball ball_state_t pointer
 */
-void paddles(Paddle_t* paddle)
+void reset_paddle_and_ball(Game_state_t* game, Paddle_t* paddle, ball_state_t* ball)
 {
-    tinygl_update();
-    if(navswitch_push_event_p (NAVSWITCH_SOUTH)) {
-        *paddle = paddle_move_right(*paddle);
-    }
-    if(navswitch_push_event_p (NAVSWITCH_NORTH)) {
-        *paddle = paddle_move_left(*paddle);
-    }
+    *paddle = paddle_init();
+    *ball = ball_init (0,3, DIR_E);
+    tinygl_draw_point(ball->pos, 1);
+    game->has_ball = true;
+    game->mode = PLAY_MODE;
 }
 
-
-
-void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
+/**
+ * @param paddle Paddle_t pointer
+ * @param ball ball_state_t pointer
+ * @param game Game_state_t pointer
+*/
+void move_ball(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 {   
-
     if(game->has_ball){
-        tinygl_draw_point(ball->position, 0);
+        tinygl_draw_point(ball->pos, 0);
         *ball = ball_update(*ball, *paddle);
-        if(ball->position.x == POINT_SCORED ) {
+        if(ball->pos.x == POINT_SCORED ) {
             game->opponent_score++;
             if(game->opponent_score == 5) {
                 ir_uart_putc(GAME_OVER);
@@ -72,10 +76,10 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
                 game->mode = DISPLAY_SCORE;
             }
         }
-        else if(ball->position.x < 0) {
+        else if(ball->pos.x < 0) {
             game->has_ball = false;
         } else {
-            tinygl_draw_point(ball->position, 1);
+            tinygl_draw_point(ball->pos, 1);
         }
         
     }
@@ -83,12 +87,21 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 
 
 
+/** Starts the game upon navswitch push, or upon recieving navswitch push from opponent
+ * @param paddle Paddle_t pointer
+ * @param ball ball_state_t pointer
+ * @param game Game_state_t pointer
+*/
 
-
-void start_game(Paddle_t* paddle, Game_state_t* game) 
+void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game) 
 {
     if(navswitch_push_event_p (NAVSWITCH_PUSH)){
-        //TRANSMIT READY Tsetup
+        //TRANSMIT READY TO PLAY
+        ir_uart_putc(1);   
+        reset_paddle_and_ball(game, paddle, ball);
+        game->opponent_score = 0;
+        game->mode = PLAY_MODE;
+    }
 
     if(ir_uart_read_ready_p()) {
         //RECIEVE READY TO PLAY 
@@ -99,43 +112,38 @@ void start_game(Paddle_t* paddle, Game_state_t* game)
             game->has_ball = false;
             game->opponent_score = 0;
         }
-        }
 
-    }
     }
 }
 
+/** Check for IR transmission
+ * if the first character recieved is not game over, recieve direction too
+ * @param game Game_state_t pointer
+ * @param ball ball_state_t pointer
+*/
 void check_for_transmission(Game_state_t* game, ball_state_t* ball)
 {
     uint8_t character = 0;
-    uint8_t direction = 3;
+    uint8_t dir = 3;
     if(ir_uart_read_ready_p()){
         character = ir_uart_getc();
         if(character == GAME_OVER){
             game_over(game);
         } else {
-            direction = ir_uart_getc();
-            if(check_ball_received(ball, character, direction)){
-                tinygl_draw_point(ball->position, 1);
+            dir = ir_uart_getc();
+            if(check_ball_received(ball, character, dir)){
+                tinygl_draw_point(ball->pos, 1);
                 game->has_ball = true;
             }
         }
     }
 }
 
-void reset_paddle_and_ball(Game_state_t* game, Paddle_t* paddle, ball_state_t* ball)
-{
-    tinygl_clear();
-    game->mode = PLAY_MODE;
-    *paddle = paddle_init();
-    *ball = ball_init (0,3, DIR_E);
-    tinygl_draw_point(ball->pos, 1);
-    game->has_ball = true;
-}
 
 int main (void)
 {
     initialize();
+
     Paddle_t paddle;
     ball_state_t ball;
     Game_state_t game;
@@ -143,12 +151,15 @@ int main (void)
     game.score = INITIAL_SCORE;
     game.opponent_score = INITIAL_SCORE;
     game.mode = START_MODE;
+    game.has_ball = false;
 
     led_init();
     led_set(LED1, 0);
+
     uint32_t tick = 0;
-    display_game_start();
     char scores[7] = "012345\0";
+
+    display_game_start();
     while(1) {
         pacer_wait();
         tinygl_update();
@@ -157,20 +168,21 @@ int main (void)
 
         switch(game.mode) {
             case START_MODE:
-                start_game(&paddle, &game);
+                start_game(&paddle, &ball, &game);
                 break;
             case PLAY_MODE:
-                paddles(&paddle);
+                move_paddles(&paddle);
                 if(!(game.has_ball)){
                     check_for_transmission(&game, &ball);
                 } 
                 if(tick >= 200) {
-                    do_ball_stuff(&paddle, &ball, &game);
+                    move_ball(&paddle, &ball, &game);
                     tick = 0;
                 }
                 break;
             case DISPLAY_SCORE:
                 if(navswitch_push_event_p (NAVSWITCH_PUSH)){
+                    tinygl_clear();
                     reset_paddle_and_ball(&game, &paddle, &ball);
                 } else {
                     display_scores(&game, scores);
