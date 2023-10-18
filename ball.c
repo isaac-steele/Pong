@@ -10,180 +10,191 @@
 #include "ir_uart.h"
 #include "paddle.h"
 
-/** Initialise the state of a ball
-    @param xstart x coordinate to start at
-    @param ystart y coordinate to start at
-    @param dir initial direction
-    @return state.  */
-ball_state_t ball_init (uint8_t xstart, uint8_t ystart, ball_dir_t dir) 
-{
-
-    ball_state_t state;
-
-    state.pos.x = xstart;
-    state.pos.y = ystart;
-    state.dir = dir;
-
-    return state;
-}
-
-
-/** Update the state of a ball bouncing off the edges of the display
-    @param state current state
-    @return new state.  */
-ball_state_t ball_update (ball_state_t state, Paddle_t paddle) 
-{
-    tinygl_point_t movement[] = {{1, 0}, {1, 1}, {1, -1},
-                             {-1, 0}, {-1, -1}, {-1, 1}};
-
-    state.pos.x += movement[state.dir].x;
-    state.pos.y += movement[state.dir].y;
-    
-    if (state.pos.y > TINYGL_HEIGHT - 1 || state.pos.y < 0)
-    {
-        ball_dir_t newdir[] = {DIR_E, DIR_SE, DIR_NE, 
-                               DIR_W, DIR_NW, DIR_SW};
-        state.pos.y -= 2 * movement[state.dir].y;
-        state.dir = newdir[state.dir];
-    }
-    
-    if (state.pos.x < 0)
-    {
-        send_ball(state);
-        turn_off_ball(state);
-    }
-
-    if (state.pos.x > TINYGL_WIDTH - 1) {
-        turn_off_ball(state);
-        state.pos.x = POINT_SCORED;
-    } else if (state.pos.x > TINYGL_WIDTH - 2) {
-
-        if(state.pos.y <= paddle.left && state.pos.y >= paddle.right) {
-            ball_dir_t newdir[] = {DIR_W, DIR_NW, DIR_SW, 
-                                        DIR_E, DIR_SE, DIR_NE};
-            state.pos.x -= 2 * movement[state.dir].x;           
-            if(state.pos.y == paddle.left) {
-                state.pos.y += 1;
-                state.dir = DIR_NW;
-            } else if (state.pos.y == paddle.right) {
-                state.pos.y -= 1;
-                state.dir = DIR_SW;
-            } else {
-                state.dir = newdir[state.dir];
-            }
-            
-
-            
-        } 
-    }
-
-    return state;
-
-}
-
-
-/** Sends the current position of the ball to another device
- * @param state the state of the ball
+/**
+ * An array of coordinates which corresponds to ball_dir_t that
+ * is used to move the ball
 */
-void send_ball (ball_state_t state)
-{
-    ir_uart_putc(state.pos.y);
+tinygl_point_t movement[] = {
+        {1, 0}, 
+        {1, 1}, 
+        {1, -1},
+        {-1, 0}, 
+        {-1, -1}, 
+        {-1, 1}
+    };
 
-    ir_uart_putc(send_dir(state.dir));
+/** Initialise the position and direction of the ball
+    @param xPosition the position on the x axis to start at
+    @param yPosition the position on the y axis to start at
+    @param direction the initial direction
+    @return the intialised ball.  */
+ball_state_t ball_init (uint8_t xPosition, uint8_t yPosition, ball_dir_t direction) 
+{
+
+    ball_state_t ball = {
+        .position.x = xPosition,
+        .position.y = yPosition,
+        .direction = direction
+    };
+
+    return ball;
 }
 
-// /** Receives the current state of the ball 
-//  * @return state
-// */
-// ball_state_t receive_ball(uint8_t y_pos) 
-// {  
-//     ball_state_t state;
-//     state.pos.x = 0;
-//     state.pos.y = 0;
-//     state.dir = DIR_W;
 
-//     if (ir_uart_read_ready_p ()) {
-//         uint8_t dir = ir_uart_getc ();
-//         state = ball_init(0, convert_ypos(y_pos), get_dir(dir));
-        
-        
-//     }
-   
-//     return state;
+/** Updates the position and direction of a ball based on whether it hits the paddle,
+ * a wall, or needs to get sent to the other player
+    @param ball current position and direction of the ball
+    @param paddle the current paddle
+    @return new position and direction of the ball.  */
+ball_state_t ball_update (ball_state_t ball, Paddle_t paddle) 
+{
+    move_ball(&ball);
+    
+    if (ball.position.y > MAX_Y_POSITON || ball.position.y < MIN_Y_POSITION) {
 
-   
-// }
+        update_ball_y_wall(&ball);
+    }
+    
+    if (ball.position.x < MIN_X_POSITION) {
+
+        send_ball(ball);
+        turn_off_ball(ball);
+    }
+
+    if (ball.position.x > MAX_X_POSITION) {
+
+        turn_off_ball(ball);
+        ball.position.x = POINT_SCORED;
+
+    } else if (ball.position.x > MAX_X_PADDLE_POSITION) {
+        
+        update_ball_paddle(&ball, paddle);
+        
+    }
+
+    return ball;
+
+}
+
+/**
+ * Updates the ball position and direction if it hits a wall on the y axis
+ * @param ball the current position and direction of the ball
+ * 
+*/
+void update_ball_y_wall(ball_state_t* ball)
+{
+    ball_dir_t updatedDirection[] = {
+            DIR_E, 
+            DIR_SE, 
+            DIR_NE, 
+            DIR_W, 
+            DIR_NW, 
+            DIR_SW
+        };
+    ball->position.y -= 2 * movement[ball->direction].y;
+    ball->direction = updatedDirection[ball->direction];
+}
+
+/**
+ * Moves the ball 
+ * @param ball a pointer to the current position and direction of the ball
+*/
+void move_ball(ball_state_t* ball)
+{
+    ball->position.x += movement[ball->direction].x;
+    ball->position.y += movement[ball->direction].y;
+}
+
+/**
+ * Updates the ball position if it has the chance to hit the paddle
+ * @param ball a pointer to the current position and direction of the ball
+ * @param paddle the current paddle
+*/
+void update_ball_paddle(ball_state_t* ball, Paddle_t paddle)
+{
+    if(ball->position.y <= paddle.left && ball->position.y >= paddle.right) {
+        ball_dir_t updatedDirection[] = {
+            DIR_W, 
+            DIR_NW, 
+            DIR_SW, 
+            DIR_E, 
+            DIR_SE, 
+            DIR_NE
+        };
+        ball->position.x -= 2 * movement[ball->direction].x;           
+        if(ball->position.y == paddle.left) {
+            ball->position.y += 1;
+            ball->direction = DIR_NW;
+        } else if (ball->position.y == paddle.right) {
+            ball->position.y -= 1;
+            ball->direction = DIR_SW;
+        } else {
+            ball->direction = updatedDirection[ball->direction];
+        }
+            
+    } 
+}
+
+
+
+
+/** Sends the current position and direction of the ball to another device
+ * @param ball the ball
+*/
+void send_ball (ball_state_t ball)
+{
+    ir_uart_putc(ball.position.y);
+
+    ir_uart_putc(send_dir(ball.direction));
+}
+
 
 /**
  * Checks if a ball is received or not
- * @return num whihc is 1 or 0 depnidng if a ball is received
+ * @param ball the current position and direction of the ball
+ * @param yPos the current yPosition of the ball
+ * @param direction the current direction of the ball
+ * @return num which is 1 or 0 depnidng if a ball is received
 */
-uint8_t check_ball_received(ball_state_t* state, uint8_t y_pos, uint8_t dir)
+uint8_t check_ball_received(ball_state_t* ball, uint8_t yPos, uint8_t direction)
 {
-    //*state = receive_ball(character, dir);
-    if(y_pos == 0 && dir == DIR_W) {
+    //*ball = receive_ball(character, direction);
+    if(yPos == 0 && direction == DIR_W) {
         return 0;
     } else {
-        *state = ball_init(0, convert_ypos(y_pos), get_dir(dir));
+        *ball = ball_init(0, convert_ypos(yPos), direction);
         return 1;
     }
 }
 
 
 /** Turns off the ball
- *@param state the state of the ball
+ *@param ball the ball
 */
-void turn_off_ball(ball_state_t state)
+void turn_off_ball(ball_state_t ball)
 {
-    tinygl_draw_point(state.pos, 0);
+    tinygl_draw_point(ball.position, 0);
 }
 
 
 /**
- * Gets the ball_dir to send
- * @param dir the current direction of the ball
+ * Gets the ball direction to send
+ * @param direction the current direction of the ball
  * @return ball direction
 */
-uint8_t send_dir(ball_dir_t dir)
+uint8_t send_dir(ball_dir_t direction)
 {
-    uint8_t new_dir = 0;
+    uint8_t new_dir = DIR_E;
 
-    switch(dir) 
+    switch(direction) 
     {
         case DIR_W:
-            new_dir = 0;
-            break;
-        case DIR_SW:
-            new_dir = 1;
-            break;
-        case DIR_NW:
-            new_dir = 2;
-            break;
-        default:
-            break;
-    }
-
-    return new_dir;
-}
-
-/**
- * Gets the ball dir
- * @param dir_number the directon number
- * @return ball direction
-*/
-ball_dir_t get_dir(uint8_t dir_number)
-{
-    ball_dir_t new_dir = 0;
-
-    switch(dir_number) 
-    {
-        case 0:
             new_dir = DIR_E;
             break;
-        case 1:
+        case DIR_SW:
             new_dir = DIR_NE;
             break;
-        case 2:
+        case DIR_NW:
             new_dir = DIR_SE;
             break;
         default:
@@ -195,12 +206,12 @@ ball_dir_t get_dir(uint8_t dir_number)
 
 /**
  * Converts the y position
- * @param y_pos the y position
+ * @param yPos the y position
  * @return the updated y position
 */
-uint8_t convert_ypos(uint8_t ypos)
+uint8_t convert_ypos(uint8_t yPos)
 {
-    switch(ypos) {
+    switch(yPos) {
         case 0:
             return 6;
         case 1:

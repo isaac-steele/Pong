@@ -64,7 +64,7 @@ void paddles(Paddle_t* paddle)
         *paddle = paddle_move_left(*paddle);
     }
 }
-Isaac Steele ist46, Kade Lindsay kli107
+
 void make_game_over(Game_state_t* game)
 {
     game->mode = GAME_OVER;
@@ -80,9 +80,9 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 {   
 
     if(game->has_ball){
-        tinygl_draw_point(ball->pos, 0);
+        tinygl_draw_point(ball->position, 0);
         *ball = ball_update(*ball, *paddle);
-        if(ball->pos.x == POINT_SCORED ) {
+        if(ball->position.x == POINT_SCORED ) {
             game->opponent_score++;
             if(game->opponent_score == 5) {
                 ir_uart_putc(GAME_OVER);
@@ -92,10 +92,10 @@ void do_ball_stuff(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
                 game->mode = DISPLAY_SCORE;
             }
         }
-        else if(ball->pos.x < 0) {
+        else if(ball->position.x < 0) {
             game->has_ball = false;
         } else {
-            tinygl_draw_point(ball->pos, 1);
+            tinygl_draw_point(ball->position, 1);
         }
         
     }
@@ -118,7 +118,7 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
         game->mode = PLAY_MODE;
         *paddle = paddle_init();
         *ball = ball_init (0,3, DIR_E);
-        tinygl_draw_point(ball->pos, 1);
+        tinygl_draw_point(ball->position, 1);
         game->opponent_score = 0;
     }
 
@@ -130,7 +130,7 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
             *paddle = paddle_init();
             game->has_ball = false;
             game->opponent_score = 0;
-        }Isaac Steele ist46, Kade Lindsay kli107
+        }
 
     }
 }
@@ -138,15 +138,15 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 void check_for_transmission(Game_state_t* game, ball_state_t* ball)
 {
     uint8_t character = 0;
-    uint8_t dir = 3;
+    uint8_t direction = 3;
     if(ir_uart_read_ready_p()){
         character = ir_uart_getc();
         if(character == GAME_OVER){
             make_game_over(game);
-        } else {Isaac Steele ist46, Kade Lindsay kli107
-            dir = ir_uart_getc();
-            if(check_ball_received(ball, character, dir)){
-                tinygl_draw_point(ball->pos, 1);
+        } else {
+            direction = ir_uart_getc();
+            if(check_ball_received(ball, character, direction)){
+                tinygl_draw_point(ball->position, 1);
                 game->has_ball = true;
             }
         }
@@ -199,7 +199,7 @@ int main (void)
                     game.mode = PLAY_MODE;
                     paddle = paddle_init();
                     ball = ball_init (0,3, DIR_E);
-                    tinygl_draw_point(ball.pos, 1);
+                    tinygl_draw_point(ball.position, 1);
                     game.has_ball = true;
                 } else {
                     char buffer[2];
