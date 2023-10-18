@@ -51,7 +51,7 @@ void reset_paddle_and_ball(Game_state_t* game, Paddle_t* paddle, ball_state_t* b
 {
     *paddle = paddle_init();
     *ball = ball_init (0,3, DIR_E);
-    tinygl_draw_point(ball->pos, 1);
+    tinygl_draw_point(ball->position, 1);
     game->has_ball = true;
     game->mode = PLAY_MODE;
 }
@@ -61,12 +61,12 @@ void reset_paddle_and_ball(Game_state_t* game, Paddle_t* paddle, ball_state_t* b
  * @param ball ball_state_t pointer
  * @param game Game_state_t pointer
 */
-void move_ball(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
+void update_ball_movement(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 {   
     if(game->has_ball){
-        tinygl_draw_point(ball->pos, 0);
+        tinygl_draw_point(ball->position, 0);
         *ball = ball_update(*ball, *paddle);
-        if(ball->pos.x == POINT_SCORED ) {
+        if(ball->position.x == POINT_SCORED ) {
             game->opponent_score++;
             if(game->opponent_score == 5) {
                 ir_uart_putc(GAME_OVER);
@@ -76,10 +76,10 @@ void move_ball(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
                 game->mode = DISPLAY_SCORE;
             }
         }
-        else if(ball->pos.x < 0) {
+        else if(ball->position.x < 0) {
             game->has_ball = false;
         } else {
-            tinygl_draw_point(ball->pos, 1);
+            tinygl_draw_point(ball->position, 1);
         }
         
     }
@@ -132,7 +132,7 @@ void check_for_transmission(Game_state_t* game, ball_state_t* ball)
         } else {
             dir = ir_uart_getc();
             if(check_ball_received(ball, character, dir)){
-                tinygl_draw_point(ball->pos, 1);
+                tinygl_draw_point(ball->position, 1);
                 game->has_ball = true;
             }
         }
@@ -176,7 +176,7 @@ int main (void)
                     check_for_transmission(&game, &ball);
                 } 
                 if(tick >= 200) {
-                    move_ball(&paddle, &ball, &game);
+                    update_ball_movement(&paddle, &ball, &game);
                     tick = 0;
                 }
                 break;
