@@ -1,8 +1,8 @@
 ## group_521 - PONG
 
 ## Authors
-- Isaac Steele
-- Kade Lindsay
+- Isaac Steele ist46
+- Kade Lindsay kli107 
 
 ## Rules
 - Don't let the ball get past your paddle!
