@@ -62,6 +62,10 @@ Paddle_t paddle_move_right(Paddle_t paddle)
     return paddle;
 }
 
+/** moves the paddle based on navswitch input
+ * @param paddle paddle_t position struct
+ * 
+*/
 void move_paddles(Paddle_t* paddle)
 {
     if(navswitch_push_event_p (NAVSWITCH_SOUTH)) {
