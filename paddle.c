@@ -10,14 +10,6 @@
 #include "pacer.h"
 #include "paddle.h"
 
-#define PADDLE_LEFT_BORDER 0
-#define PADDLE_RIGHT_BORDER 6
-#define PADDLE_COLUMN 4
-#define INITIAL_RIGHT 4
-#define INITIAL_LEFT 2
-/**
- * 
-*/
 
 /** Initialize paddle ends and draw a line between these two points
  * @return Paddle_t paddle struct */

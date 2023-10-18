@@ -17,6 +17,8 @@
 #define MIN_X_POSITION 0
 #define MAX_X_PADDLE_POSITION TINYGL_WIDTH - 2
 #define MAX_X_POSITION TINYGL_WIDTH - 1
+#define NO_CHARACTER 0
+#define NO_DIRECTION DIR_W
 
 /** Has all the possible directions the ball can go */
 typedef enum {

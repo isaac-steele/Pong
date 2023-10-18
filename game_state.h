@@ -1,6 +1,6 @@
-/** @file paddle.c
+/** @file game_state.h
     @author Kade Lindsay kli107, Isaac Steele ist46
-    @date 9 August 2023
+    @date 18 October 2023
     @brief Display text for different game states including score
 */
 
@@ -10,6 +10,9 @@
 
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
+
+#define GAME_OVER 10
+#define WINNING_SCORE 5
 
 /** Contains all key information about current state of play
  * Mode information is encoded as int's to allow for easy transmit

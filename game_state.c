@@ -1,13 +1,12 @@
-/** @file paddle.c
+/** @file game_state.c
     @author Kade Lindsay kli107, Isaac Steele ist46
-    @date 9 August 2023
+    @date 18 October 2023
     @brief Display text for different game states including score
 */
 
 #include "game_state.h"
 #include "tinygl.h"
-#define GAME_OVER 10
-#define WINNING_SCORE 5
+
 
 /**
  * Displays the game over screen and sets game state to game over

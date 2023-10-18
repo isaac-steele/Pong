@@ -23,9 +23,13 @@
 #define PLAY_MODE 1
 #define DISPLAY_SCORE 2
 #define GAME_OVER 10
-
 #define PACER_RATE 1000
 #define MESSAGE_RATE 10
+#define BALL_RATE 200
+#define START_X 0
+#define START_Y 3
+#define START_DIR DIR_E
+#define START_GAME 1
 
 /* Initialize all relevant functions such as system, pacer, tinygl, navswitch and IR*/
 void initialize(void) 
@@ -50,7 +54,7 @@ void initialize(void)
 void reset_paddle_and_ball(Game_state_t* game, Paddle_t* paddle, ball_state_t* ball)
 {
     *paddle = paddle_init();
-    *ball = ball_init (0,3, DIR_E);
+    *ball = ball_init (START_X,START_Y, START_DIR);
     tinygl_draw_point(ball->position, 1);
     game->has_ball = true;
     game->mode = PLAY_MODE;
@@ -68,7 +72,7 @@ void update_ball_movement(Paddle_t* paddle, ball_state_t* ball, Game_state_t* ga
         *ball = ball_update(*ball, *paddle);
         if(ball->position.x == POINT_SCORED ) {
             game->opponent_score++;
-            if(game->opponent_score == 5) {
+            if(game->opponent_score == WINNING_SCORE) {
                 ir_uart_putc(GAME_OVER);
                 game_over(game);
             } else {
@@ -76,7 +80,7 @@ void update_ball_movement(Paddle_t* paddle, ball_state_t* ball, Game_state_t* ga
                 game->mode = DISPLAY_SCORE;
             }
         }
-        else if(ball->position.x < 0) {
+        else if(ball->position.x < MIN_X_POSITION) {
             game->has_ball = false;
         } else {
             tinygl_draw_point(ball->position, 1);
@@ -97,20 +101,18 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 {
     if(navswitch_push_event_p (NAVSWITCH_PUSH)){
         //TRANSMIT READY TO PLAY
-        ir_uart_putc(1);   
+        ir_uart_putc(START_GAME);   
         reset_paddle_and_ball(game, paddle, ball);
-        game->opponent_score = 0;
         game->mode = PLAY_MODE;
     }
 
     if(ir_uart_read_ready_p()) {
         //RECIEVE READY TO PLAY 
         char character = ir_uart_getc();
-        if(character == 1) {
+        if(character == START_GAME) {
             game->mode = PLAY_MODE;
             *paddle = paddle_init();
             game->has_ball = false;
-            game->opponent_score = 0;
         }
 
     }
@@ -123,8 +125,8 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 */
 void check_for_transmission(Game_state_t* game, ball_state_t* ball)
 {
-    uint8_t character = 0;
-    uint8_t dir = 3;
+    uint8_t character = NO_CHARACTER;
+    uint8_t dir = NO_DIRECTION;
     if(ir_uart_read_ready_p()){
         character = ir_uart_getc();
         if(character == GAME_OVER){
@@ -175,7 +177,7 @@ int main (void)
                 if(!(game.has_ball)){
                     check_for_transmission(&game, &ball);
                 } 
-                if(tick >= 200) {
+                if(tick >= BALL_RATE) {
                     update_ball_movement(&paddle, &ball, &game);
                     tick = 0;
                 }

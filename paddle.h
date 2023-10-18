@@ -10,6 +10,12 @@
 #include "system.h"
 #include "navswitch.h"
 
+#define PADDLE_LEFT_BORDER 0
+#define PADDLE_RIGHT_BORDER 6
+#define PADDLE_COLUMN 4
+#define INITIAL_RIGHT 4
+#define INITIAL_LEFT 2
+
 /*Endpoints of the paddle*/
 typedef struct {
     int left;  

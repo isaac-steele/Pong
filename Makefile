@@ -16,7 +16,7 @@ all: game.out
 
 
 # Compile: create object files from C source files.
-game.o: game.c ../../drivers/avr/system.h paddle.h ball.h ../../utils/tinygl.h ../../utils/pacer.h ../../drivers/led.h
+game.o: game.c ../../drivers/avr/system.h paddle.h ball.h game_state.h ../../utils/tinygl.h ../../utils/pacer.h ../../drivers/led.h ../../drivers/navswitch.h ../../drivers/avr/ir_uart.h ../../fonts/font5x7_1.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 system.o: ../../drivers/avr/system.c ../../drivers/avr/system.h

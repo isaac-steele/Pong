@@ -159,7 +159,7 @@ void send_ball (ball_state_t ball)
 uint8_t check_ball_received(ball_state_t* ball, uint8_t yPos, uint8_t direction)
 {
     //*ball = receive_ball(character, direction);
-    if(yPos == 0 && direction == DIR_W) {
+    if(yPos == NO_CHARACTER && direction == NO_DIRECTION) {
         return 0;
     } else {
         *ball = ball_init(0, convert_ypos(yPos), direction);
