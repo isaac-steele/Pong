@@ -1,8 +1,8 @@
 ## group_521 - PONG
 
 ## Authors
-- Isaac Steele ist46
-- Kade Lindsay kli107 
+- Isaac Steele - ist46
+- Kade Lindsay - kli107 
 
 ## Rules
 - Don't let the ball get past your paddle!
@@ -10,8 +10,8 @@
 
 ## Setup
 - Have two UCFK4's connected to the same computer
-- Navigate to the group_521 directory
-- Run make program twice
+- Navigate to the "group_521" directory
+- Run "make program" twice
 
 ## How To Play
 - Have your UCFK4 rotated horizontally so that the navswitch is on the side closest to you
