@@ -8,6 +8,11 @@
 - Don't let the ball get past your paddle!
 - First to five wins!
 
+## Setup
+- Have two UCFK4's connected to the same computer
+- Navigate to the group_521 directory
+- Run make program twice
+
 ## How To Play
 - Have your UCFK4 rotated horizontally so that the navswitch is on the side closest to you
 - When both players are ready, one player presses the navswitch and that is the player who starts with the ball
