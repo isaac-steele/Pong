@@ -1,4 +1,4 @@
-## group_521 - PONG
+# group_521 - PONG
 
 ## Authors
 - Isaac Steele - ist46
