@@ -47,9 +47,9 @@ void initialize(void)
 
 /** 
  * Resets the paddle and ball to initial positions
- * @param game Game_state_t pointer
- * @param paddle Paddle_t pointer
- * @param ball ball_state_t pointer
+ * @param game pointer to the current state of the game
+ * @param paddle pointer to the current paddle
+ * @param ball pointer to the current state of the ball
 */
 void reset_paddle_and_ball(Game_state_t* game, Paddle_t* paddle, ball_state_t* ball)
 {
@@ -60,10 +60,10 @@ void reset_paddle_and_ball(Game_state_t* game, Paddle_t* paddle, ball_state_t* b
     game->mode = PLAY_MODE;
 }
 
-/**
- * @param paddle Paddle_t pointer
- * @param ball ball_state_t pointer
- * @param game Game_state_t pointer
+/** Updates the ball movement and checks if a point has been scored
+ * @param paddle pointer to the current paddle
+ * @param ball pointer to the current state of the ball
+ * @param game pointer to the current state of the game
 */
 void update_ball_movement(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 {   
@@ -92,9 +92,9 @@ void update_ball_movement(Paddle_t* paddle, ball_state_t* ball, Game_state_t* ga
 
 
 /** Starts the game upon navswitch push, or upon recieving navswitch push from opponent
- * @param paddle Paddle_t pointer
- * @param ball ball_state_t pointer
- * @param game Game_state_t pointer
+ * @param paddle pointer to the current paddle
+ * @param ball pointer to the current state of the ball
+ * @param game pointer to the current state of the game
 */
 
 void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game) 
@@ -120,8 +120,8 @@ void start_game(Paddle_t* paddle, ball_state_t* ball, Game_state_t* game)
 
 /** Check for IR transmission
  * if the first character recieved is not game over, recieve direction too
- * @param game Game_state_t pointer
- * @param ball ball_state_t pointer
+ * @param game pointer to the current state of the game
+ * @param ball pointer to the current state of the ball
 */
 void check_for_transmission(Game_state_t* game, ball_state_t* ball)
 {

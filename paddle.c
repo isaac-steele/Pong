@@ -12,7 +12,7 @@
 
 
 /** Initialize paddle ends and draw a line between these two points
- * @return Paddle_t paddle struct */
+ * @return an initialized paddle */
 Paddle_t paddle_init(void)
 {   
     tinygl_clear(); // clear the board before adding the paddle
@@ -25,7 +25,7 @@ Paddle_t paddle_init(void)
 }
 
 /** Shifts paddle to the left by one pixel
- * @param paddle paddle_t position struct
+ * @param paddle the current paddle
  * @return updated paddle position
 */
 Paddle_t paddle_move_left(Paddle_t paddle)
@@ -40,7 +40,7 @@ Paddle_t paddle_move_left(Paddle_t paddle)
 }
 
 /** Shifts the paddle to the right by one pixel
- * @param paddle paddle_t position struct
+ * @param paddle the current paddle
  * @return updated paddle position
 */
 Paddle_t paddle_move_right(Paddle_t paddle)
@@ -55,8 +55,8 @@ Paddle_t paddle_move_right(Paddle_t paddle)
     return paddle;
 }
 
-/** moves the paddle based on navswitch input
- * @param paddle paddle_t position struct
+/** Moves the paddle based on navswitch input
+ * @param paddle pointer to the current paddle
  * 
 */
 void move_paddles(Paddle_t* paddle)

@@ -22,13 +22,25 @@ typedef struct {
     int right;
 } Paddle_t;
 
-/*Initialize the paddle to be at the center of the players side of the display*/
+/** Initialize paddle ends and draw a line between these two points
+ * @return an initialized paddle */
 Paddle_t paddle_init(void);
-/** Shifts the paddle to the left one pixel*/
+
+/** Shifts paddle to the left by one pixel
+ * @param paddle the current paddle
+ * @return updated paddle position
+*/
 Paddle_t paddle_move_left(Paddle_t paddle);
-/*Shifts the paddle to the right one pixel*/
+
+/** Shifts the paddle to the right by one pixel
+ * @param paddle the current paddle
+ * @return updated paddle position
+*/
 Paddle_t paddle_move_right(Paddle_t paddle);
-/*Function to move the paddle based on navswitch input*/
+
+/** Moves the paddle based on navswitch input
+ * @param paddle pointer to the current paddle
+ */
 void move_paddles(Paddle_t* paddle);
 
 #endif /* PADDLE_H*/

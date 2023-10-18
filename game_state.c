@@ -24,7 +24,7 @@ void game_over(Game_state_t* game)
 }
 
 
-/*Displays the welcome text*/
+/*Displays the welcome to pong text*/
 void display_game_start(void)
 {
     tinygl_clear();
@@ -33,7 +33,7 @@ void display_game_start(void)
 
 
 /** Displays the current score of your opponent on your screen
- * @param game Game_state_t pointer
+ * @param game pointer to the current game state
  * @param scores List of scores, 0-5 and end of line
 */
 void display_scores(Game_state_t* game, char scores[7])
