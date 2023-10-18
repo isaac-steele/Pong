@@ -192,6 +192,7 @@ int main (void)
                 break;
             case GAME_OVER:
                 if(navswitch_push_event_p (NAVSWITCH_PUSH)){
+                    game.opponent_score = INITIAL_SCORE;
                     tinygl_clear();
                     game.mode = START_MODE;
                     display_game_start();
