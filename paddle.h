@@ -22,5 +22,6 @@ Paddle_t paddle_init(void);
 */
 Paddle_t paddle_move_left(Paddle_t paddle);
 Paddle_t paddle_move_right(Paddle_t paddle);
+void move_paddles(Paddle_t* paddle);
 
-#endif /* PACER_H*/
+#endif /* PADDLE_H*/

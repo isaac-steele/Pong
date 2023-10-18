@@ -61,3 +61,13 @@ Paddle_t paddle_move_right(Paddle_t paddle)
     tinygl_draw_line (tinygl_point (PADDLE_COLUMN, paddle.left), tinygl_point (PADDLE_COLUMN, paddle.right), 1);
     return paddle;
 }
+
+void move_paddles(Paddle_t* paddle)
+{
+    if(navswitch_push_event_p (NAVSWITCH_SOUTH)) {
+        *paddle = paddle_move_right(*paddle);
+    }
+    if(navswitch_push_event_p (NAVSWITCH_NORTH)) {
+        *paddle = paddle_move_left(*paddle);
+    }
+}
